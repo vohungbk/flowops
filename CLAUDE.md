@@ -73,6 +73,23 @@ Copy `.env.example` → `.env.local` and fill in values from Supabase Dashboard 
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `NEXT_PUBLIC_APP_URL` (used for Magic Link redirect URL)
 
+### Database schema
+
+Migration file: `supabase/migrations/20260621000000_initial_schema.sql`
+
+**To apply**: Go to Supabase Dashboard → SQL Editor → paste the file content → Run.
+
+**Tables**: `profiles`, `tags`, `customers`, `customer_tags`, `leads`, `pipeline_stages`, `deals`, `activities`, `audit_logs`.
+
+**Key design decisions**:
+- `profiles` is 1:1 with `auth.users`, created automatically by the `trg_on_auth_user_created` trigger via `handle_new_user()`.
+- `current_user_role()` is a `SECURITY DEFINER` helper function used by all RLS policies — it reads the role from `profiles` bypassing RLS, avoiding infinite recursion.
+- `pipeline_stages.order_index` is intentionally **not UNIQUE** — allows atomic reordering of multiple stages in a single UPDATE batch.
+- `audit_logs` has no UPDATE or DELETE policies — immutable by design.
+- First user signed up gets `employee` role. Promote to admin via `supabase/promote_first_admin.sql`.
+
+**Seed data included in migration**: 6 default pipeline stages (New → Qualified → Proposal → Negotiation → Closed Won → Closed Lost) + 6 default tags.
+
 ### Constants & validation
 
 - `src/lib/constants.ts` — all status enums, source lists, route paths (`ROUTES`), `PAGINATION_PAGE_SIZE`.

@@ -21,6 +21,13 @@ export const resetPasswordSchema = z.object({
   path: ["confirmPassword"],
 })
 
+export const signupSchema = z.object({
+  full_name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+})
+
 export type LoginInput = z.infer<typeof loginSchema>
 export type MagicLinkInput = z.infer<typeof magicLinkSchema>
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>
+export type SignupInput = z.infer<typeof signupSchema>

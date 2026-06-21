@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import { loginSchema, magicLinkSchema } from "@/lib/validations/auth"
+import { loginSchema, magicLinkSchema, signupSchema } from "@/lib/validations/auth"
 import type { ActionResult } from "@/types"
 
 export async function signIn(
@@ -24,6 +24,38 @@ export async function signIn(
 
   if (error) {
     return { success: false, error: "Invalid email or password." }
+  }
+
+  redirect("/dashboard")
+}
+
+export async function signUp(
+  _prevState: ActionResult,
+  formData: FormData
+): Promise<ActionResult> {
+  const raw = {
+    full_name: formData.get("full_name") as string,
+    email: formData.get("email") as string,
+    password: formData.get("password") as string,
+  }
+
+  const parsed = signupSchema.safeParse(raw)
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0].message }
+  }
+
+  const supabase = await createClient()
+  const { error } = await supabase.auth.signUp({
+    email: parsed.data.email,
+    password: parsed.data.password,
+    options: {
+      data: { full_name: parsed.data.full_name },
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+    },
+  })
+
+  if (error) {
+    return { success: false, error: error.message }
   }
 
   redirect("/dashboard")
