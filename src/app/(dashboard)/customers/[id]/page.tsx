@@ -1,10 +1,12 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { ChevronLeft } from "lucide-react"
+import { ChevronLeft, Trash2, Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { getCustomerById } from "@/lib/queries/customers"
 import { CustomerDetailTabs } from "@/components/customers/customer-detail-tabs"
+import { CustomerFormDialog } from "@/components/customers/customer-form"
+import { DeleteCustomerDialog } from "@/components/customers/delete-customer-dialog"
 import type { Tag } from "@/types"
 
 // ─── Hero helpers (server-renderable, no interactivity) ───────────────────────
@@ -98,9 +100,29 @@ export default async function CustomerDetailPage({
           </div>
         </div>
 
-        <Button variant="outline" className="shrink-0" disabled>
-          Edit
-        </Button>
+        <div className="flex shrink-0 items-center gap-2">
+          <CustomerFormDialog
+            mode="edit"
+            customer={customer}
+            trigger={
+              <Button variant="outline" className="gap-2">
+                <Pencil className="h-4 w-4" />
+                Edit
+              </Button>
+            }
+          />
+          <DeleteCustomerDialog
+            id={customer.id}
+            companyName={customer.company_name}
+            redirectTo="/customers"
+            trigger={
+              <Button variant="outline" className="gap-2 text-destructive hover:text-destructive">
+                <Trash2 className="h-4 w-4" />
+                Delete
+              </Button>
+            }
+          />
+        </div>
       </div>
 
       {/* Detail tabs */}

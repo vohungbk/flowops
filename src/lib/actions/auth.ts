@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { loginSchema, magicLinkSchema, resetPasswordSchema, signupSchema } from "@/lib/validations/auth"
-import type { ActionResult } from "@/types"
+import type { ActionResult, Profile } from "@/types"
 
 export async function signIn(
   _prevState: ActionResult,
@@ -148,7 +148,7 @@ export async function getSession() {
   return user
 }
 
-export async function getCurrentProfile() {
+export async function getCurrentProfile(): Promise<Profile | null> {
   const supabase = await createClient()
   const {
     data: { user },
@@ -162,5 +162,5 @@ export async function getCurrentProfile() {
     .eq("id", user.id)
     .single()
 
-  return profile
+  return profile as Profile | null
 }

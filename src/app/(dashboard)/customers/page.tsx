@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { getCustomers } from "@/lib/queries/customers"
 import { CustomerFilters } from "@/components/customers/customer-filters"
 import { CustomerTable } from "@/components/customers/customer-table"
+import { CustomerFormDialog } from "@/components/customers/customer-form"
 
 type SearchParams = {
   search?: string
@@ -36,10 +37,15 @@ export default async function CustomersPage({
             {total} {total === 1 ? "customer" : "customers"} total
           </p>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          Add Customer
-        </Button>
+        <CustomerFormDialog
+          mode="create"
+          trigger={
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add Customer
+            </Button>
+          }
+        />
       </div>
 
       {/* Filters */}

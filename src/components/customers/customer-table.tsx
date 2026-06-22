@@ -33,6 +33,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { CustomerFormDialog } from "@/components/customers/customer-form"
+import { DeleteCustomerDialog } from "@/components/customers/delete-customer-dialog"
 import type { Customer } from "@/types"
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
@@ -60,49 +62,53 @@ function StatusBadge({ status }: { status: string }) {
 
 // ─── Row actions dropdown ─────────────────────────────────────────────────────
 
-function RowActions({ id }: { id: string }) {
+function RowActions({ customer }: { customer: Customer }) {
   const router = useRouter()
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <MoreHorizontal className="h-4 w-4" />
-        <span className="sr-only">Open menu</span>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem
-          className="cursor-pointer gap-2"
-          onClick={(e) => {
-            e.stopPropagation()
-            router.push(`/customers/${id}`)
-          }}
+    <div onClick={(e) => e.stopPropagation()}>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
         >
-          <Eye className="h-4 w-4" />
-          View
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          className="cursor-pointer gap-2"
-          onClick={(e) => {
-            e.stopPropagation()
-            router.push(`/customers/${id}?edit=1`)
-          }}
-        >
-          <Pencil className="h-4 w-4" />
-          Edit
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className="cursor-pointer gap-2"
-          variant="destructive"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Trash2 className="h-4 w-4" />
-          Delete
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <MoreHorizontal className="h-4 w-4" />
+          <span className="sr-only">Open menu</span>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            className="cursor-pointer gap-2"
+            onClick={() => router.push(`/customers/${customer.id}`)}
+          >
+            <Eye className="h-4 w-4" />
+            View
+          </DropdownMenuItem>
+          <CustomerFormDialog
+            mode="edit"
+            customer={customer}
+            trigger={
+              <DropdownMenuItem className="cursor-pointer gap-2" onSelect={(e) => e.preventDefault()}>
+                <Pencil className="h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+            }
+          />
+          <DropdownMenuSeparator />
+          <DeleteCustomerDialog
+            id={customer.id}
+            companyName={customer.company_name}
+            trigger={
+              <DropdownMenuItem
+                className="cursor-pointer gap-2"
+                variant="destructive"
+                onSelect={(e) => e.preventDefault()}
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            }
+          />
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   )
 }
 
@@ -162,7 +168,7 @@ const columns: ColumnDef<Customer>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <RowActions id={row.original.id} />,
+    cell: ({ row }) => <RowActions customer={row.original} />,
   },
 ]
 
