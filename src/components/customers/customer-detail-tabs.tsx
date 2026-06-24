@@ -1,6 +1,8 @@
 "use client"
 
 import type { ElementType } from "react"
+import { useState, useTransition } from "react"
+import { useRouter } from "next/navigation"
 import {
   Phone,
   Mail,
@@ -16,13 +18,17 @@ import {
   Plus,
   ChevronRight,
   MessageSquare,
+  Tag as TagIcon,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { LogActivityDialog } from "@/components/shared/log-activity-dialog"
+import { updateCustomerTags } from "@/lib/actions/customers"
 import type { CustomerDetail, CustomerDeal, CustomerActivity } from "@/lib/queries/customers"
+import type { Tag } from "@/types"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -118,18 +124,89 @@ function EmptyState({
   )
 }
 
+// ─── Tag picker ───────────────────────────────────────────────────────────────
+
+function TagPicker({
+  customerId,
+  availableTags,
+  initialSelectedIds,
+}: {
+  customerId: string
+  availableTags: Tag[]
+  initialSelectedIds: string[]
+}) {
+  const router = useRouter()
+  const [selectedIds, setSelectedIds] = useState<string[]>(initialSelectedIds)
+  const [isPending, startTransition] = useTransition()
+
+  function toggleTag(tagId: string) {
+    const next = selectedIds.includes(tagId)
+      ? selectedIds.filter((id) => id !== tagId)
+      : [...selectedIds, tagId]
+
+    setSelectedIds(next)
+    startTransition(async () => {
+      await updateCustomerTags(customerId, next)
+      router.refresh()
+    })
+  }
+
+  if (availableTags.length === 0) {
+    return <p className="text-sm text-muted-foreground">No tags configured.</p>
+  }
+
+  return (
+    <div className={cn("flex flex-wrap gap-1.5", isPending && "opacity-60")}>
+      {availableTags.map((tag) => {
+        const selected = selectedIds.includes(tag.id)
+        return (
+          <button
+            key={tag.id}
+            type="button"
+            onClick={() => toggleTag(tag.id)}
+            disabled={isPending}
+            className={cn(
+              "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-opacity",
+              selected
+                ? "opacity-100"
+                : "opacity-40 hover:opacity-70"
+            )}
+            style={
+              selected
+                ? {
+                    borderColor: tag.color + "60",
+                    color: tag.color,
+                    backgroundColor: tag.color + "18",
+                  }
+                : {
+                    borderColor: "hsl(var(--border))",
+                    color: "hsl(var(--muted-foreground))",
+                    backgroundColor: "transparent",
+                  }
+            }
+          >
+            {tag.name}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 interface CustomerDetailTabsProps {
   customer: CustomerDetail
   deals: CustomerDeal[]
   activities: CustomerActivity[]
+  availableTags: Tag[]
 }
 
 export function CustomerDetailTabs({
   customer,
   deals,
   activities,
+  availableTags,
 }: CustomerDetailTabsProps) {
   const openDeals = deals.filter(
     (d) => !d.stage.is_closed_won && !d.stage.is_closed_lost
@@ -179,6 +256,19 @@ export function CustomerDetailTabs({
 
           <Card>
             <CardHeader>
+              <CardTitle className="text-sm">Tags</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TagPicker
+                customerId={customer.id}
+                availableTags={availableTags}
+                initialSelectedIds={customer.tags.map((t) => t.id)}
+              />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle className="text-sm">Assigned To</CardTitle>
             </CardHeader>
             <CardContent>
@@ -204,11 +294,11 @@ export function CustomerDetailTabs({
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="sm:col-span-2">
             <CardHeader>
               <CardTitle className="text-sm">Pipeline Summary</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               {[
                 { label: "Open deals", value: String(openDeals.length) },
                 { label: "Pipeline value", value: formatCurrency(totalOpen) },
@@ -219,16 +309,16 @@ export function CustomerDetailTabs({
                 },
                 { label: "Activities logged", value: String(activities.length) },
               ].map(({ label, value, highlight }) => (
-                <div key={label} className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">{label}</span>
-                  <span
+                <div key={label}>
+                  <p className="text-xs text-muted-foreground">{label}</p>
+                  <p
                     className={cn(
-                      "text-sm font-medium",
+                      "mt-0.5 text-sm font-semibold",
                       highlight && "text-emerald-600 dark:text-emerald-400"
                     )}
                   >
                     {value}
-                  </span>
+                  </p>
                 </div>
               ))}
             </CardContent>
@@ -313,10 +403,15 @@ export function CustomerDetailTabs({
               {activities.length}{" "}
               {activities.length === 1 ? "activity" : "activities"}
             </p>
-            <Button size="sm" className="gap-1.5" disabled>
-              <Plus className="h-3.5 w-3.5" />
-              Log Activity
-            </Button>
+            <LogActivityDialog
+              customerId={customer.id}
+              trigger={
+                <Button size="sm" className="gap-1.5">
+                  <Plus className="h-3.5 w-3.5" />
+                  Log Activity
+                </Button>
+              }
+            />
           </div>
 
           {activities.length === 0 ? (

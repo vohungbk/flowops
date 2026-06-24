@@ -2,6 +2,15 @@ import { createClient } from "@/lib/supabase/server"
 import { PAGINATION_PAGE_SIZE } from "@/lib/constants"
 import type { Customer, Profile, Tag, Deal, PipelineStage, Activity } from "@/types"
 
+export async function getTags(): Promise<Tag[]> {
+  const supabase = await createClient()
+  const { data } = (await supabase
+    .from("tags")
+    .select("*")
+    .order("name")) as unknown as { data: Tag[] | null }
+  return data ?? []
+}
+
 export type GetCustomersParams = {
   search?: string
   status?: string

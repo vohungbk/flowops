@@ -84,6 +84,34 @@ export async function updateCustomer(
   return { success: true, data: null }
 }
 
+export async function updateCustomerTags(
+  customerId: string,
+  tagIds: string[]
+): Promise<ActionResult> {
+  const profile = await getCurrentProfile()
+  if (!profile) return { success: false, error: "Not authenticated" }
+
+  const supabase = await createClient()
+
+  const { error: deleteError } = (await (supabase.from("customer_tags") as unknown as {
+    delete: () => { eq: (col: string, val: string) => Promise<PgMutationResult> }
+  }).delete().eq("customer_id", customerId))
+
+  if (deleteError) return { success: false, error: deleteError.message }
+
+  if (tagIds.length > 0) {
+    const rows = tagIds.map((tag_id) => ({ customer_id: customerId, tag_id }))
+    const { error: insertError } = (await (supabase.from("customer_tags") as unknown as {
+      insert: (v: object[]) => Promise<PgMutationResult>
+    }).insert(rows))
+
+    if (insertError) return { success: false, error: insertError.message }
+  }
+
+  revalidatePath(`${ROUTES.customers}/${customerId}`)
+  return { success: true, data: null }
+}
+
 export async function deleteCustomer(id: string): Promise<ActionResult> {
   const profile = await getCurrentProfile()
   if (!profile) return { success: false, error: "Not authenticated" }

@@ -3,7 +3,7 @@ import Link from "next/link"
 import { ChevronLeft, Trash2, Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { getCustomerById } from "@/lib/queries/customers"
+import { getCustomerById, getTags } from "@/lib/queries/customers"
 import { CustomerDetailTabs } from "@/components/customers/customer-detail-tabs"
 import { CustomerFormDialog } from "@/components/customers/customer-form"
 import { DeleteCustomerDialog } from "@/components/customers/delete-customer-dialog"
@@ -53,7 +53,10 @@ export default async function CustomerDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const { customer, deals, activities } = await getCustomerById(id)
+  const [{ customer, deals, activities }, allTags] = await Promise.all([
+    getCustomerById(id),
+    getTags(),
+  ])
 
   if (!customer) notFound()
 
@@ -130,6 +133,7 @@ export default async function CustomerDetailPage({
         customer={customer}
         deals={deals}
         activities={activities}
+        availableTags={allTags}
       />
     </div>
   )

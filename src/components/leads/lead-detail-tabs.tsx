@@ -13,13 +13,14 @@ import {
   Clock,
   MessageSquare,
   TrendingUp,
+  Plus,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Plus } from "lucide-react"
+import { LogActivityDialog } from "@/components/shared/log-activity-dialog"
 import type { LeadDetail, LeadActivity } from "@/lib/queries/leads"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -221,10 +222,15 @@ export function LeadDetailTabs({ lead, activities }: LeadDetailTabsProps) {
               {activities.length}{" "}
               {activities.length === 1 ? "activity" : "activities"}
             </p>
-            <Button size="sm" className="gap-1.5" disabled>
-              <Plus className="h-3.5 w-3.5" />
-              Log Activity
-            </Button>
+            <LogActivityDialog
+              leadId={lead.id}
+              trigger={
+                <Button size="sm" className="gap-1.5">
+                  <Plus className="h-3.5 w-3.5" />
+                  Log Activity
+                </Button>
+              }
+            />
           </div>
 
           {activities.length === 0 ? (
