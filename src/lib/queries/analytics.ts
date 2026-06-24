@@ -206,6 +206,142 @@ export async function getRecentActivities(limit = 8): Promise<RecentActivityRow[
   }))
 }
 
+// ─── Lead source breakdown ───────────────────────────────────────────────────
+
+export type LeadSourceDataPoint = {
+  source: string
+  label: string
+  count: number
+}
+
+export async function getLeadSourceBreakdown(): Promise<LeadSourceDataPoint[]> {
+  const supabase = await createClient()
+
+  type SourceRow = { source: string }
+  const { data } = (await supabase
+    .from("leads")
+    .select("source")) as unknown as QueryOf<SourceRow>
+
+  const SOURCE_LABELS: Record<string, string> = {
+    web: "Website",
+    referral: "Referral",
+    linkedin: "LinkedIn",
+    event: "Event",
+    "cold-outreach": "Cold Outreach",
+    other: "Other",
+  }
+
+  const counts: Record<string, number> = {}
+  for (const row of data ?? []) {
+    counts[row.source] = (counts[row.source] ?? 0) + 1
+  }
+
+  return Object.entries(counts)
+    .map(([source, count]) => ({
+      source,
+      label: SOURCE_LABELS[source] ?? source,
+      count,
+    }))
+    .sort((a, b) => b.count - a.count)
+}
+
+// ─── Conversion funnel (lead statuses) ───────────────────────────────────────
+
+export type FunnelDataPoint = {
+  status: string
+  label: string
+  count: number
+}
+
+export async function getConversionFunnel(): Promise<FunnelDataPoint[]> {
+  const supabase = await createClient()
+
+  type StatusRow = { status: string }
+  const { data } = (await supabase
+    .from("leads")
+    .select("status")) as unknown as QueryOf<StatusRow>
+
+  const STATUS_ORDER = ["new", "contacted", "qualified", "converted", "disqualified"]
+  const STATUS_LABELS: Record<string, string> = {
+    new: "New",
+    contacted: "Contacted",
+    qualified: "Qualified",
+    converted: "Converted",
+    disqualified: "Disqualified",
+  }
+
+  const counts: Record<string, number> = {}
+  for (const row of data ?? []) {
+    counts[row.status] = (counts[row.status] ?? 0) + 1
+  }
+
+  return STATUS_ORDER
+    .filter((s) => counts[s] !== undefined)
+    .map((status) => ({
+      status,
+      label: STATUS_LABELS[status] ?? status,
+      count: counts[status] ?? 0,
+    }))
+}
+
+// ─── Rep leaderboard ─────────────────────────────────────────────────────────
+
+export type RepLeaderboardRow = {
+  id: string
+  full_name: string
+  avatar_url: string | null
+  deals_won: number
+  revenue: number
+  active_deals: number
+}
+
+export async function getRepLeaderboard(): Promise<RepLeaderboardRow[]> {
+  const supabase = await createClient()
+
+  type ProfileRow = { id: string; full_name: string; avatar_url: string | null }
+  type DealRepRow = { assigned_to: string | null; value: number; stage_id: string }
+  type StageRow = { id: string; is_closed_won: boolean; is_closed_lost: boolean }
+
+  const [profilesResult, dealsResult, stagesResult] = (await Promise.all([
+    supabase
+      .from("profiles")
+      .select("id, full_name, avatar_url")
+      .eq("is_active", true)
+      .in("role", ["employee", "manager"]),
+    supabase.from("deals").select("assigned_to, value, stage_id"),
+    supabase.from("pipeline_stages").select("id, is_closed_won, is_closed_lost"),
+  ])) as unknown as [QueryOf<ProfileRow>, QueryOf<DealRepRow>, QueryOf<StageRow>]
+
+  const stageMap = new Map((stagesResult.data ?? []).map((s) => [s.id, s]))
+  const deals = dealsResult.data ?? []
+
+  const stats: Record<string, { deals_won: number; revenue: number; active_deals: number }> = {}
+  for (const deal of deals) {
+    if (!deal.assigned_to) continue
+    if (!stats[deal.assigned_to]) {
+      stats[deal.assigned_to] = { deals_won: 0, revenue: 0, active_deals: 0 }
+    }
+    const stage = stageMap.get(deal.stage_id)
+    if (stage?.is_closed_won) {
+      stats[deal.assigned_to].deals_won += 1
+      stats[deal.assigned_to].revenue += deal.value
+    } else if (!stage?.is_closed_lost) {
+      stats[deal.assigned_to].active_deals += 1
+    }
+  }
+
+  return (profilesResult.data ?? [])
+    .map((p) => ({
+      id: p.id,
+      full_name: p.full_name,
+      avatar_url: p.avatar_url,
+      deals_won: stats[p.id]?.deals_won ?? 0,
+      revenue: stats[p.id]?.revenue ?? 0,
+      active_deals: stats[p.id]?.active_deals ?? 0,
+    }))
+    .sort((a, b) => b.revenue - a.revenue)
+}
+
 // ─── Top open deals ───────────────────────────────────────────────────────────
 
 export type TopDealRow = {
