@@ -36,13 +36,15 @@ export type LeadWithAssignee = Lead & {
 // ─── Dashboard & Analytics types ─────────────────────────────────────────────
 export type KpiMetrics = {
   totalCustomers: number
+  newCustomersThisMonth: number
   totalLeads: number
-  conversionRate: number
+  activeDeals: number
   monthlyRevenue: number
+  monthlyRevenueLastMonth: number
   pipelineValue: number
   winRate: number
   avgDealSize: number
-  activeEmployees: number
+  activitiesThisWeek: number
 }
 
 export type RevenueDataPoint = {
