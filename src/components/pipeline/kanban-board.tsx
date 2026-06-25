@@ -9,11 +9,13 @@ import {
   type DragEndEvent,
 } from "@dnd-kit/core"
 import { Plus } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { KanbanColumn } from "@/components/pipeline/kanban-column"
 import { DealCardContent } from "@/components/pipeline/deal-card"
 import { DealFormDialog } from "@/components/pipeline/deal-form"
 import { moveDeal } from "@/lib/actions/deals"
+import { usePipelineRealtime } from "@/hooks/use-pipeline-realtime"
 import type { PipelineStage, Customer } from "@/types"
 import type { DealCardData, StageWithDeals } from "@/lib/queries/deals"
 
@@ -28,6 +30,9 @@ export function KanbanBoard({ stages: initialStages, customers }: KanbanBoardPro
   const [activeId, setActiveId] = useState<string | null>(null)
   const [overId, setOverId] = useState<string | null>(null)
   const [, startTransition] = useTransition()
+
+  // Realtime subscription — updates stages when another user changes a deal
+  const { markPending } = usePipelineRealtime(setStages)
 
   // Find a deal across all stages
   function findDeal(dealId: string): DealCardData | undefined {
@@ -65,6 +70,9 @@ export function KanbanBoard({ stages: initialStages, customers }: KanbanBoardPro
     const deal = findDeal(dealId)
     if (!deal || deal.stage_id === newStageId) return
 
+    // Mark as pending so the realtime echo of our own mutation is suppressed
+    markPending(dealId)
+
     // Optimistic update
     setStages((prev) =>
       prev.map((stage) => {
@@ -91,7 +99,13 @@ export function KanbanBoard({ stages: initialStages, customers }: KanbanBoardPro
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Pipeline</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold tracking-tight">Pipeline</h1>
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+              <span className={cn("h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse")} />
+              Live
+            </span>
+          </div>
           <p className="text-sm text-muted-foreground">
             {totalPipelineValue > 0 ? (
               <>

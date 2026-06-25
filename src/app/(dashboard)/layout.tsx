@@ -1,3 +1,4 @@
+import { Toaster } from "sonner"
 import { Sidebar } from "@/components/layout/sidebar"
 import { Header } from "@/components/layout/header"
 import { CommandPalette } from "@/components/shared/command-palette"
@@ -20,6 +21,7 @@ export default async function DashboardLayout({
         </main>
       </div>
       <CommandPalette />
+      <Toaster position="bottom-right" richColors closeButton />
     </div>
   )
 }
