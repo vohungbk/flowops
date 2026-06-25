@@ -1,16 +1,22 @@
-import { UserCog } from "lucide-react"
+import { redirect } from "next/navigation"
+import { getCurrentProfile } from "@/lib/actions/auth"
+import { getEmployees } from "@/lib/queries/employees"
+import { EmployeeGrid } from "@/components/employees/employee-grid"
+import { ROUTES } from "@/lib/constants"
 
-export default function EmployeesPage() {
+export default async function EmployeesPage() {
+  const profile = await getCurrentProfile()
+
+  // Employees cannot access this page
+  if (!profile || profile.role === "employee") {
+    redirect(ROUTES.dashboard)
+  }
+
+  const employees = await getEmployees()
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Employees</h1>
-        <p className="text-muted-foreground">Manage your team members.</p>
-      </div>
-      <div className="flex items-center gap-3 rounded-lg border border-dashed p-8 text-muted-foreground">
-        <UserCog className="h-5 w-5" />
-        <span className="text-sm">Employee management coming soon.</span>
-      </div>
+      <EmployeeGrid employees={employees} currentProfile={profile} />
     </div>
   )
 }
