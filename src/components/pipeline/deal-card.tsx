@@ -1,8 +1,9 @@
 "use client"
 
+import { useState } from "react"
 import { useDraggable } from "@dnd-kit/core"
 import { CSS } from "@dnd-kit/utilities"
-import { Calendar, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
+import { Calendar, MoreHorizontal, Pencil, Trash2, GripVertical } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
@@ -15,6 +16,7 @@ import {
 import { buttonVariants } from "@/components/ui/button"
 import { DealFormDialog } from "@/components/pipeline/deal-form"
 import { DeleteDealDialog } from "@/components/pipeline/delete-deal-dialog"
+import { DealDetailSheet } from "@/components/pipeline/deal-detail-sheet"
 import type { PipelineStage, Customer } from "@/types"
 import type { DealCardData } from "@/lib/queries/deals"
 
@@ -113,6 +115,8 @@ interface DealCardProps {
 }
 
 export function DealCard({ deal, stages, customers }: DealCardProps) {
+  const [sheetOpen, setSheetOpen] = useState(false)
+
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({ id: deal.id, data: { stageId: deal.stage_id } })
 
@@ -121,72 +125,94 @@ export function DealCard({ deal, stages, customers }: DealCardProps) {
     : undefined
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={cn(
-        "group relative touch-none",
-        isDragging && "opacity-30"
-      )}
-    >
-      {/* Drag handle covers most of the card */}
+    <>
       <div
-        {...attributes}
-        {...listeners}
-        className="cursor-grab active:cursor-grabbing"
+        ref={setNodeRef}
+        style={style}
+        className={cn(
+          "group relative touch-none",
+          isDragging && "opacity-30"
+        )}
       >
-        <DealCardContent deal={deal} />
+        {/* Grip handle — drag starts here */}
+        <div
+          {...attributes}
+          {...listeners}
+          className="absolute left-1.5 top-1/2 z-10 -translate-y-1/2 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <GripVertical className="h-4 w-4 text-muted-foreground" />
+        </div>
+
+        {/* Card body — click opens detail sheet */}
+        <div
+          className="cursor-pointer pl-1"
+          onClick={() => setSheetOpen(true)}
+        >
+          <DealCardContent deal={deal} />
+        </div>
+
+        {/* Actions menu */}
+        <div
+          className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "icon-sm" }),
+                "h-6 w-6 bg-card shadow-xs"
+              )}
+            >
+              <MoreHorizontal className="h-3.5 w-3.5" />
+              <span className="sr-only">Deal actions</span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DealFormDialog
+                mode="edit"
+                deal={deal}
+                stages={stages}
+                customers={customers}
+                trigger={
+                  <DropdownMenuItem
+                    className="cursor-pointer gap-2"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <Pencil className="h-4 w-4" />
+                    Edit
+                  </DropdownMenuItem>
+                }
+              />
+              <DropdownMenuSeparator />
+              <DeleteDealDialog
+                id={deal.id}
+                title={deal.title}
+                trigger={
+                  <DropdownMenuItem
+                    className="cursor-pointer gap-2"
+                    variant="destructive"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Delete
+                  </DropdownMenuItem>
+                }
+              />
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
-      {/* Actions menu — positioned absolutely, stops drag propagation */}
-      <div
-        className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100"
-        onPointerDown={(e) => e.stopPropagation()}
-      >
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            className={cn(
-              buttonVariants({ variant: "ghost", size: "icon-sm" }),
-              "h-6 w-6 bg-card shadow-xs"
-            )}
-          >
-            <MoreHorizontal className="h-3.5 w-3.5" />
-            <span className="sr-only">Deal actions</span>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DealFormDialog
-              mode="edit"
-              deal={deal}
-              stages={stages}
-              customers={customers}
-              trigger={
-                <DropdownMenuItem
-                  className="cursor-pointer gap-2"
-                  onSelect={(e) => e.preventDefault()}
-                >
-                  <Pencil className="h-4 w-4" />
-                  Edit
-                </DropdownMenuItem>
-              }
-            />
-            <DropdownMenuSeparator />
-            <DeleteDealDialog
-              id={deal.id}
-              title={deal.title}
-              trigger={
-                <DropdownMenuItem
-                  className="cursor-pointer gap-2"
-                  variant="destructive"
-                  onSelect={(e) => e.preventDefault()}
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Delete
-                </DropdownMenuItem>
-              }
-            />
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </div>
+      {/* Detail sheet — outside the draggable div so it's not affected by transform */}
+      <DealDetailSheet
+        deal={deal}
+        stages={stages}
+        customers={customers}
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+      />
+    </>
   )
 }
