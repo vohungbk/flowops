@@ -213,15 +213,24 @@ interface CustomerFormDialogProps {
   mode: "create" | "edit"
   customer?: Customer
   trigger: React.ReactNode
+  defaultOpen?: boolean
 }
 
 export function CustomerFormDialog({
   mode,
   customer,
   trigger,
+  defaultOpen,
 }: CustomerFormDialogProps) {
   const [open, setOpen] = useState(false)
   const [formKey, setFormKey] = useState(0)
+
+  useEffect(() => {
+    if (defaultOpen) {
+      setFormKey((k) => k + 1)
+      setOpen(true)
+    }
+  }, [defaultOpen])
 
   function handleOpen() {
     setFormKey((k) => k + 1)

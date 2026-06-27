@@ -12,6 +12,7 @@ type SearchParams = {
   status?: string
   source?: string
   page?: string
+  new?: string
 }
 
 export default async function LeadsPage({
@@ -41,6 +42,7 @@ export default async function LeadsPage({
         </div>
         <LeadFormDialog
           mode="create"
+          defaultOpen={!!params.new}
           trigger={
             <Button className="gap-2">
               <Plus className="h-4 w-4" />

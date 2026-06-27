@@ -11,6 +11,7 @@ type SearchParams = {
   search?: string
   status?: string
   page?: string
+  new?: string
 }
 
 export default async function CustomersPage({
@@ -39,6 +40,7 @@ export default async function CustomersPage({
         </div>
         <CustomerFormDialog
           mode="create"
+          defaultOpen={!!params.new}
           trigger={
             <Button className="gap-2">
               <Plus className="h-4 w-4" />

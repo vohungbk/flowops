@@ -212,11 +212,19 @@ interface LeadFormDialogProps {
   mode: "create" | "edit"
   lead?: Lead
   trigger: React.ReactNode
+  defaultOpen?: boolean
 }
 
-export function LeadFormDialog({ mode, lead, trigger }: LeadFormDialogProps) {
+export function LeadFormDialog({ mode, lead, trigger, defaultOpen }: LeadFormDialogProps) {
   const [open, setOpen] = useState(false)
   const [formKey, setFormKey] = useState(0)
+
+  useEffect(() => {
+    if (defaultOpen) {
+      setFormKey((k) => k + 1)
+      setOpen(true)
+    }
+  }, [defaultOpen])
 
   function handleOpen() {
     setFormKey((k) => k + 1)

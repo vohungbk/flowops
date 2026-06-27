@@ -20,7 +20,7 @@ export default async function DashboardLayout({
           {children}
         </main>
       </div>
-      <CommandPalette />
+      <CommandPalette profile={profile} />
       <Toaster position="bottom-right" richColors closeButton />
     </div>
   )
