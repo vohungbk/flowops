@@ -2,7 +2,7 @@
 
 import { useActionState, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Pencil, AlertCircle } from "lucide-react"
+import { Plus, Pencil, AlertCircle, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -161,17 +161,9 @@ function FormContent({ mode, lead, onSuccess }: FormContentProps) {
         </div>
       </div>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="score">Lead score (0–100)</Label>
-        <Input
-          id="score"
-          name="score"
-          type="number"
-          min="0"
-          max="100"
-          placeholder="0"
-          defaultValue={lead?.score ?? 0}
-        />
+      <div className="flex items-center gap-1.5 rounded-md border border-dashed bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+        <Sparkles className="h-3.5 w-3.5 shrink-0" />
+        Lead score is calculated automatically from profile completeness, source, and activity.
       </div>
 
       <div className="space-y-1.5">

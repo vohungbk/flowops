@@ -21,7 +21,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { LogActivityDialog } from "@/components/shared/log-activity-dialog"
+import { calculateLeadScore } from "@/lib/lead-scoring"
 import type { LeadDetail, LeadActivity } from "@/lib/queries/leads"
+import type { ScoreBreakdown } from "@/lib/lead-scoring"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -89,26 +91,63 @@ function EmptyState({
   )
 }
 
-// ─── Score bar ────────────────────────────────────────────────────────────────
+// ─── Score breakdown card ─────────────────────────────────────────────────────
 
-function ScoreBar({ score }: { score: number }) {
-  const color =
-    score >= 70
-      ? "bg-emerald-500"
-      : score >= 40
-        ? "bg-amber-500"
-        : "bg-red-500"
+type DimensionRowProps = { label: string; value: number; max: number; color: string }
+
+function DimensionRow({ label, value, max, color }: DimensionRowProps) {
   return (
-    <div className="space-y-1.5">
-      <div className="flex items-center justify-between text-sm">
-        <span className="text-muted-foreground">Lead score</span>
-        <span className="font-semibold tabular-nums">{score}/100</span>
+    <div className="space-y-1">
+      <div className="flex items-center justify-between text-xs">
+        <span className="text-muted-foreground">{label}</span>
+        <span className="tabular-nums text-foreground">
+          {value}
+          <span className="text-muted-foreground">/{max}</span>
+        </span>
       </div>
-      <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
         <div
           className={cn("h-full rounded-full transition-all", color)}
-          style={{ width: `${score}%` }}
+          style={{ width: `${(value / max) * 100}%` }}
         />
+      </div>
+    </div>
+  )
+}
+
+function ScoreBreakdownCard({ breakdown }: { breakdown: ScoreBreakdown }) {
+  const totalColor =
+    breakdown.total >= 70
+      ? "bg-emerald-500"
+      : breakdown.total >= 40
+        ? "bg-amber-500"
+        : "bg-red-500"
+
+  return (
+    <div className="space-y-4">
+      {/* Total */}
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">Total score</span>
+          <span className="text-2xl font-bold tabular-nums">
+            {breakdown.total}
+            <span className="text-sm font-normal text-muted-foreground">/100</span>
+          </span>
+        </div>
+        <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted">
+          <div
+            className={cn("h-full rounded-full transition-all", totalColor)}
+            style={{ width: `${breakdown.total}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Dimensions */}
+      <div className="space-y-2.5 border-t pt-3">
+        <DimensionRow label="Profile completeness" value={breakdown.completeness} max={25} color="bg-blue-500" />
+        <DimensionRow label="Source quality" value={breakdown.source} max={25} color="bg-violet-500" />
+        <DimensionRow label="Status progression" value={breakdown.status} max={20} color="bg-amber-500" />
+        <DimensionRow label="Activity engagement" value={breakdown.engagement} max={30} color="bg-emerald-500" />
       </div>
     </div>
   )
@@ -133,6 +172,13 @@ interface LeadDetailTabsProps {
 }
 
 export function LeadDetailTabs({ lead, activities }: LeadDetailTabsProps) {
+  const counts = { meeting: 0, call: 0, email: 0, task: 0, note: 0 }
+  for (const a of activities) {
+    const t = a.type as keyof typeof counts
+    if (t in counts) counts[t]++
+  }
+  const breakdown = calculateLeadScore(lead, counts)
+
   return (
     <Tabs defaultValue="overview">
       <TabsList>
@@ -181,7 +227,7 @@ export function LeadDetailTabs({ lead, activities }: LeadDetailTabsProps) {
               <CardTitle className="text-sm">Lead Score</CardTitle>
             </CardHeader>
             <CardContent>
-              <ScoreBar score={lead.score} />
+              <ScoreBreakdownCard breakdown={breakdown} />
             </CardContent>
           </Card>
 

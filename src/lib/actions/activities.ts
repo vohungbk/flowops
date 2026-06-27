@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { getCurrentProfile } from "@/lib/actions/auth"
+import { recalculateLeadScore } from "@/lib/actions/leads"
 import { ROUTES } from "@/lib/constants"
 import type { ActionResult } from "@/types"
 import { z } from "zod"
@@ -61,6 +62,7 @@ export async function createActivity(
     revalidatePath(`${ROUTES.customers}/${parsed.data.customer_id}`)
   }
   if (parsed.data.lead_id) {
+    await recalculateLeadScore(parsed.data.lead_id)
     revalidatePath(`${ROUTES.leads}/${parsed.data.lead_id}`)
   }
 
