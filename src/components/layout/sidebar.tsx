@@ -11,6 +11,7 @@ import {
   BarChart3,
   Settings,
   UserCog,
+  ShieldCheck,
   Zap,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -51,6 +52,7 @@ const navGroups: NavGroup[] = [
     label: "Team",
     items: [
       { label: "Employees", href: "/employees", icon: UserCog },
+      { label: "Audit Log", href: "/audit-log", icon: ShieldCheck },
     ],
   },
 ]

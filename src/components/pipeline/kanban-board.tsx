@@ -5,6 +5,9 @@ import {
   DndContext,
   DragOverlay,
   closestCorners,
+  useSensor,
+  useSensors,
+  PointerSensor,
   type DragStartEvent,
   type DragEndEvent,
 } from "@dnd-kit/core"
@@ -25,6 +28,11 @@ interface KanbanBoardProps {
 }
 
 export function KanbanBoard({ stages: initialStages, customers }: KanbanBoardProps) {
+  // Require 8px of movement before a drag starts — short clicks still fire onClick
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+  )
+
   // Local state for optimistic drag updates
   const [stages, setStages] = useState<StageWithDeals[]>(initialStages)
   const [activeId, setActiveId] = useState<string | null>(null)
@@ -167,6 +175,7 @@ export function KanbanBoard({ stages: initialStages, customers }: KanbanBoardPro
 
       {/* Kanban */}
       <DndContext
+        sensors={sensors}
         collisionDetection={closestCorners}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}

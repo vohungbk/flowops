@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useDraggable } from "@dnd-kit/core"
 import { CSS } from "@dnd-kit/utilities"
-import { Calendar, MoreHorizontal, Pencil, Trash2, GripVertical } from "lucide-react"
+import { Calendar, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
@@ -126,34 +126,23 @@ export function DealCard({ deal, stages, customers }: DealCardProps) {
 
   return (
     <>
+      {/* Listeners on the outer div so the whole card surface is draggable.
+          The PointerSensor (distance: 8) in DndContext lets short clicks
+          fall through to onClick without starting a drag. */}
       <div
         ref={setNodeRef}
         style={style}
+        {...attributes}
+        {...listeners}
         className={cn(
-          "group relative touch-none",
+          "group relative touch-none cursor-grab active:cursor-grabbing",
           isDragging && "opacity-30"
         )}
+        onClick={() => setSheetOpen(true)}
       >
-        {/* Grip handle — drag starts here */}
-        <div
-          {...attributes}
-          {...listeners}
-          className="absolute left-1.5 top-1/2 z-10 -translate-y-1/2 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <GripVertical className="h-4 w-4 text-muted-foreground" />
-        </div>
+        <DealCardContent deal={deal} />
 
-        {/* Card body — click opens detail sheet */}
-        <div
-          className="cursor-pointer pl-1"
-          onClick={() => setSheetOpen(true)}
-        >
-          <DealCardContent deal={deal} />
-        </div>
-
-        {/* Actions menu */}
+        {/* Actions menu — stops pointer events so the dropdown doesn't start a drag */}
         <div
           className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100"
           onPointerDown={(e) => e.stopPropagation()}
