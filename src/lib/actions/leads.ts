@@ -59,8 +59,11 @@ async function scoreOneLead(leadId: string): Promise<void> {
 
   const { total } = calculateLeadScore(leadData, counts)
 
+  // Uses a SECURITY DEFINER RPC so the score update succeeds even when the
+  // calling user didn't create or own the lead (e.g. a teammate logged an activity).
+  // Cast needed: Schema resolves to never because table types omit Relationships.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (supabase.from("leads") as any).update({ score: total }).eq("id", leadId)
+  await (supabase.rpc as any)("set_lead_score", { p_lead_id: leadId, p_score: total })
 }
 
 // ─── Public server action: manual recalculate (e.g. after bulk import) ───────

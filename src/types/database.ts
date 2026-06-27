@@ -370,7 +370,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      // NOTE: rpc() type inference fails because table types omit Relationships.
+      // Call supabase.rpc() with (... as any) until Relationships are regenerated.
+      set_lead_score: {
+        Args: { p_lead_id: string; p_score: number }
+        Returns: null
+      }
     }
     Enums: {
       user_role: "admin" | "manager" | "employee"
