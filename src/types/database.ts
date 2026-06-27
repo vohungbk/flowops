@@ -336,6 +336,35 @@ export type Database = {
         }
         Update: never
       }
+      notifications: {
+        Row: {
+          id: string
+          user_id: string
+          actor_id: string | null
+          type: string
+          title: string
+          body: string | null
+          entity_type: string | null
+          entity_id: string | null
+          is_read: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          actor_id?: string | null
+          type: string
+          title: string
+          body?: string | null
+          entity_type?: string | null
+          entity_id?: string | null
+          is_read?: boolean
+          created_at?: string
+        }
+        Update: {
+          is_read?: boolean
+        }
+      }
     }
     Views: {
       [_ in never]: never

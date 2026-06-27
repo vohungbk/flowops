@@ -9,6 +9,7 @@ export type PipelineStage = Tables<"pipeline_stages">
 export type Activity = Tables<"activities">
 export type Tag = Tables<"tags">
 export type AuditLog = Tables<"audit_logs">
+export type AppNotification = Tables<"notifications">
 
 // ─── Enum types ──────────────────────────────────────────────────────────────
 export type UserRole = "admin" | "manager" | "employee"

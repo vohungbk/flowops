@@ -1,6 +1,6 @@
 "use client"
 
-import { Bell, Moon, Sun, Search, LogOut, Settings, User, BellOff } from "lucide-react"
+import { Moon, Sun, Search, LogOut, Settings, User } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
@@ -14,13 +14,16 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { signOut } from "@/lib/actions/auth"
+import { NotificationBell } from "@/components/layout/notification-bell"
 import type { Profile } from "@/types"
+import type { NotificationWithActor } from "@/lib/queries/notifications"
 
 interface HeaderProps {
   profile: Profile | null
+  notifications: NotificationWithActor[]
+  unreadCount: number
 }
 
 function getInitials(name: string) {
@@ -33,7 +36,7 @@ const ROLE_BADGE: Record<string, string> = {
   employee: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400",
 }
 
-export function Header({ profile }: HeaderProps) {
+export function Header({ profile, notifications, unreadCount }: HeaderProps) {
   const { theme, setTheme } = useTheme()
   const router = useRouter()
 
@@ -71,42 +74,10 @@ export function Header({ profile }: HeaderProps) {
         </Tooltip>
 
         {/* Notifications */}
-        <Popover>
-          <PopoverTrigger
-            aria-label="Notifications"
-            className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "relative")}
-          >
-            <Bell className="h-4 w-4" />
-            <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-primary" />
-          </PopoverTrigger>
-          <PopoverContent align="end" side="bottom" sideOffset={8} className="w-80 p-0">
-            <div className="flex items-center justify-between border-b px-4 py-3">
-              <span className="text-sm font-semibold">Notifications</span>
-              <button className="text-xs text-muted-foreground transition-colors hover:text-foreground">
-                Mark all read
-              </button>
-            </div>
-
-            <div className="flex flex-col items-center gap-2 py-10 text-center">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                <BellOff className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <p className="text-sm font-medium">You&apos;re all caught up</p>
-              <p className="text-xs text-muted-foreground">
-                New notifications will appear here
-              </p>
-            </div>
-
-            <div className="border-t px-4 py-2.5">
-              <button
-                className="w-full text-center text-xs text-muted-foreground transition-colors hover:text-foreground"
-                onClick={() => router.push("/dashboard")}
-              >
-                View all activity
-              </button>
-            </div>
-          </PopoverContent>
-        </Popover>
+        <NotificationBell
+          initialNotifications={notifications}
+          initialUnread={unreadCount}
+        />
 
         {/* User menu */}
         <DropdownMenu>
