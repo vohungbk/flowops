@@ -171,6 +171,12 @@ function formatDate(dateStr: string) {
 
 // ─── Column definitions ───────────────────────────────────────────────────────
 
+const COL_CLASS: Record<string, string> = {
+  company: "hidden sm:table-cell",
+  source: "hidden sm:table-cell",
+  created_at: "hidden lg:table-cell",
+}
+
 const columns: ColumnDef<Lead>[] = [
   {
     accessorKey: "first_name",
@@ -282,13 +288,13 @@ export function LeadTable({ data, total, page, pageSize, hasActiveFilter }: Lead
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border">
+      <div className="overflow-x-auto rounded-lg border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((hg) => (
               <TableRow key={hg.id} className="hover:bg-transparent">
                 {hg.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className={COL_CLASS[header.column.id]}>
                     {flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
@@ -303,7 +309,7 @@ export function LeadTable({ data, total, page, pageSize, hasActiveFilter }: Lead
                 onClick={() => router.push(`/leads/${row.original.id}`)}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
+                  <TableCell key={cell.id} className={COL_CLASS[cell.column.id]}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}

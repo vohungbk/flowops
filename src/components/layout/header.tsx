@@ -6,6 +6,7 @@ import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { MobileSidebar } from "@/components/layout/mobile-sidebar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,21 +43,26 @@ export function Header({ profile, notifications, unreadCount }: HeaderProps) {
 
   return (
     <header className="flex h-14 shrink-0 items-center justify-between border-b bg-background px-4">
-      {/* Search trigger → Command Palette */}
-      <button
-        className="flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted"
-        onClick={() =>
-          document.dispatchEvent(
-            new KeyboardEvent("keydown", { key: "k", metaKey: true })
-          )
-        }
-      >
-        <Search className="h-3.5 w-3.5" />
-        <span>Search...</span>
-        <kbd className="ml-4 rounded border bg-background px-1.5 py-0.5 font-mono text-xs">
-          ⌘K
-        </kbd>
-      </button>
+      <div className="flex items-center gap-2">
+        {/* Hamburger — mobile only */}
+        <MobileSidebar />
+
+        {/* Search trigger → Command Palette */}
+        <button
+          className="flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted"
+          onClick={() =>
+            document.dispatchEvent(
+              new KeyboardEvent("keydown", { key: "k", metaKey: true })
+            )
+          }
+        >
+          <Search className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">Search...</span>
+          <kbd className="ml-2 hidden rounded border bg-background px-1.5 py-0.5 font-mono text-xs sm:inline-flex">
+            ⌘K
+          </kbd>
+        </button>
+      </div>
 
       {/* Right actions */}
       <div className="flex items-center gap-1">

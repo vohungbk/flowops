@@ -127,6 +127,13 @@ function formatDate(dateStr: string) {
 
 // ─── Column definitions ───────────────────────────────────────────────────────
 
+// Columns hidden on small screens to prevent overflow
+const COL_CLASS: Record<string, string> = {
+  email: "hidden sm:table-cell",
+  industry: "hidden sm:table-cell",
+  created_at: "hidden lg:table-cell",
+}
+
 const columns: ColumnDef<Customer>[] = [
   {
     accessorKey: "company_name",
@@ -235,13 +242,13 @@ export function CustomerTable({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border">
+      <div className="overflow-x-auto rounded-lg border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((hg) => (
               <TableRow key={hg.id} className="hover:bg-transparent">
                 {hg.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className={COL_CLASS[header.column.id]}>
                     {flexRender(
                       header.column.columnDef.header,
                       header.getContext()
@@ -259,7 +266,7 @@ export function CustomerTable({
                 onClick={() => router.push(`/customers/${row.original.id}`)}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
+                  <TableCell key={cell.id} className={COL_CLASS[cell.column.id]}>
                     {flexRender(
                       cell.column.columnDef.cell,
                       cell.getContext()

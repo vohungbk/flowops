@@ -95,7 +95,7 @@ export default async function LeadDetailPage({
       </Link>
 
       {/* Hero header */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-4">
           {/* Lead initial */}
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-xl font-bold text-primary">
@@ -126,7 +126,7 @@ export default async function LeadDetailPage({
           </div>
         </div>
 
-        <div className="flex shrink-0 flex-wrap items-center gap-2">
+        <div className="flex shrink-0 flex-wrap items-center gap-2 sm:self-start">
           {!isConverted && (
             <ConvertLeadDialog
               id={lead.id}

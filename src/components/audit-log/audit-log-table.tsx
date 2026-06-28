@@ -281,7 +281,7 @@ export function AuditLogTable({ data, total, page, pageSize, hasActiveFilter }: 
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border">
+      <div className="overflow-x-auto rounded-lg border">
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
