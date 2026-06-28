@@ -56,7 +56,13 @@ export default async function AuditLogPage({
         <AuditLogFilters profiles={profiles} />
       </Suspense>
 
-      <AuditLogTable data={data} total={total} page={page} pageSize={pageSize} />
+      <AuditLogTable
+        data={data}
+        total={total}
+        page={page}
+        pageSize={pageSize}
+        hasActiveFilter={!!(params.action || params.entity_type || params.user_id || params.period)}
+      />
     </div>
   )
 }

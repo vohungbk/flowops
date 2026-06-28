@@ -15,9 +15,12 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
+  Building2,
+  SearchX,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
+import { EmptyState } from "@/components/shared/empty-state"
 import {
   Table,
   TableBody,
@@ -179,6 +182,7 @@ interface CustomerTableProps {
   total: number
   page: number
   pageSize: number
+  hasActiveFilter?: boolean
 }
 
 export function CustomerTable({
@@ -186,6 +190,7 @@ export function CustomerTable({
   total,
   page,
   pageSize,
+  hasActiveFilter,
 }: CustomerTableProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -210,6 +215,24 @@ export function CustomerTable({
     })
   }
 
+  if (data.length === 0) {
+    return hasActiveFilter ? (
+      <EmptyState
+        icon={SearchX}
+        title="No customers match your filters"
+        description="Try adjusting your search or status filter to find what you're looking for."
+        secondaryAction={{ label: "Clear filters", href: "/customers" }}
+      />
+    ) : (
+      <EmptyState
+        icon={Building2}
+        title="No customers yet"
+        description="Add your first customer to start managing your relationships."
+        action={{ label: "Add customer", href: "/customers?new=true" }}
+      />
+    )
+  }
+
   return (
     <div className="space-y-4">
       <div className="rounded-lg border">
@@ -229,33 +252,22 @@ export function CustomerTable({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-40 text-center text-muted-foreground"
-                >
-                  No customers found.
-                </TableCell>
+            {table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                className="cursor-pointer"
+                onClick={() => router.push(`/customers/${row.original.id}`)}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(
+                      cell.column.columnDef.cell,
+                      cell.getContext()
+                    )}
+                  </TableCell>
+                ))}
               </TableRow>
-            ) : (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  className="cursor-pointer"
-                  onClick={() => router.push(`/customers/${row.original.id}`)}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            )}
+            ))}
           </TableBody>
         </Table>
       </div>

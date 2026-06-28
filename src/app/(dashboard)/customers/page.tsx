@@ -62,6 +62,7 @@ export default async function CustomersPage({
           total={total}
           page={page}
           pageSize={pageSize}
+          hasActiveFilter={!!(params.search || params.status)}
         />
       </Suspense>
     </div>

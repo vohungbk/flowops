@@ -1,12 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { UserPlus } from "lucide-react"
+import { UserPlus, Users } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { EmployeeDetailSheet } from "@/components/employees/employee-detail-sheet"
 import { InviteEmployeeDialog } from "@/components/employees/invite-employee-dialog"
+import { EmptyState } from "@/components/shared/empty-state"
 import type { Profile } from "@/types"
 import type { EmployeeWithStats } from "@/lib/queries/employees"
 
@@ -117,19 +118,6 @@ function EmployeeCard({
   )
 }
 
-// ─── Empty state ──────────────────────────────────────────────────────────────
-
-function EmptyState() {
-  return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-16 text-center">
-      <p className="text-muted-foreground text-sm">No team members yet.</p>
-      <p className="text-muted-foreground text-xs mt-1">
-        Invite your first employee to get started.
-      </p>
-    </div>
-  )
-}
-
 // ─── Main component ───────────────────────────────────────────────────────────
 
 interface EmployeeGridProps {
@@ -172,7 +160,15 @@ export function EmployeeGrid({ employees, currentProfile }: EmployeeGridProps) {
 
       {/* Grid */}
       {employees.length === 0 ? (
-        <EmptyState />
+        <EmptyState
+          icon={Users}
+          title="No team members yet"
+          description={
+            isAdmin
+              ? "Invite your team to give them access to FlowOps."
+              : "Team members will appear here once they join."
+          }
+        />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {employees.map((emp) => (

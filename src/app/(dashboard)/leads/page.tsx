@@ -59,7 +59,13 @@ export default async function LeadsPage({
 
       {/* Table */}
       <Suspense fallback={<TableSkeleton />}>
-        <LeadTable data={data} total={total} page={page} pageSize={pageSize} />
+        <LeadTable
+          data={data}
+          total={total}
+          page={page}
+          pageSize={pageSize}
+          hasActiveFilter={!!(params.search || params.status || params.source)}
+        />
       </Suspense>
     </div>
   )

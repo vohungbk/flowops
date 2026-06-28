@@ -3,7 +3,8 @@
 import { useState } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { useTransition } from "react"
-import { ChevronDown, ChevronRight, ChevronLeft } from "lucide-react"
+import { ChevronDown, ChevronRight, ChevronLeft, ScrollText, SearchX } from "lucide-react"
+import { EmptyState } from "@/components/shared/empty-state"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -236,9 +237,10 @@ interface AuditLogTableProps {
   total: number
   page: number
   pageSize: number
+  hasActiveFilter?: boolean
 }
 
-export function AuditLogTable({ data, total, page, pageSize }: AuditLogTableProps) {
+export function AuditLogTable({ data, total, page, pageSize, hasActiveFilter }: AuditLogTableProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -260,6 +262,23 @@ export function AuditLogTable({ data, total, page, pageSize }: AuditLogTableProp
     setExpandedId((prev) => (prev === id ? null : id))
   }
 
+  if (data.length === 0) {
+    return hasActiveFilter ? (
+      <EmptyState
+        icon={SearchX}
+        title="No events match your filters"
+        description="Try adjusting the action, entity type, user, or period filter."
+        secondaryAction={{ label: "Clear filters", href: "/audit-log" }}
+      />
+    ) : (
+      <EmptyState
+        icon={ScrollText}
+        title="No audit events yet"
+        description="Actions taken in the system will be recorded and shown here."
+      />
+    )
+  }
+
   return (
     <div className="space-y-4">
       <div className="rounded-lg border">
@@ -275,17 +294,7 @@ export function AuditLogTable({ data, total, page, pageSize }: AuditLogTableProp
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={6}
-                  className="h-40 text-center text-muted-foreground"
-                >
-                  No audit events found.
-                </TableCell>
-              </TableRow>
-            ) : (
-              data.map((log) => {
+            {data.map((log) => {
                 const hasChanges =
                   log.old_values !== null || log.new_values !== null
                 const isExpanded = expandedId === log.id
@@ -367,8 +376,7 @@ export function AuditLogTable({ data, total, page, pageSize }: AuditLogTableProp
                     )}
                   </>
                 )
-              })
-            )}
+              })}
           </TableBody>
         </Table>
       </div>

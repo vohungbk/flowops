@@ -16,9 +16,12 @@ import {
   UserCheck,
   ChevronLeft,
   ChevronRight,
+  UserPlus,
+  SearchX,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
+import { EmptyState } from "@/components/shared/empty-state"
 import {
   Table,
   TableBody,
@@ -234,9 +237,10 @@ interface LeadTableProps {
   total: number
   page: number
   pageSize: number
+  hasActiveFilter?: boolean
 }
 
-export function LeadTable({ data, total, page, pageSize }: LeadTableProps) {
+export function LeadTable({ data, total, page, pageSize, hasActiveFilter }: LeadTableProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -258,6 +262,24 @@ export function LeadTable({ data, total, page, pageSize }: LeadTableProps) {
     startTransition(() => router.push(`${pathname}?${params.toString()}`))
   }
 
+  if (data.length === 0) {
+    return hasActiveFilter ? (
+      <EmptyState
+        icon={SearchX}
+        title="No leads match your filters"
+        description="Try adjusting your search, status, or source filter to see results."
+        secondaryAction={{ label: "Clear filters", href: "/leads" }}
+      />
+    ) : (
+      <EmptyState
+        icon={UserPlus}
+        title="No leads yet"
+        description="Capture your first lead to start building your sales pipeline."
+        action={{ label: "Add lead", href: "/leads?new=true" }}
+      />
+    )
+  }
+
   return (
     <div className="space-y-4">
       <div className="rounded-lg border">
@@ -274,30 +296,19 @@ export function LeadTable({ data, total, page, pageSize }: LeadTableProps) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-40 text-center text-muted-foreground"
-                >
-                  No leads found.
-                </TableCell>
+            {table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                className="cursor-pointer"
+                onClick={() => router.push(`/leads/${row.original.id}`)}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
               </TableRow>
-            ) : (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  className="cursor-pointer"
-                  onClick={() => router.push(`/leads/${row.original.id}`)}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            )}
+            ))}
           </TableBody>
         </Table>
       </div>
