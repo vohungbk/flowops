@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ChevronLeft, Pencil, Trash2, UserCheck } from "lucide-react"
@@ -8,6 +9,21 @@ import { LeadDetailTabs } from "@/components/leads/lead-detail-tabs"
 import { LeadFormDialog } from "@/components/leads/lead-form"
 import { DeleteLeadDialog } from "@/components/leads/delete-lead-dialog"
 import { ConvertLeadDialog } from "@/components/leads/convert-lead-dialog"
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  const { lead } = await getLeadById(id)
+  if (!lead) return { title: "Lead Not Found" }
+  const name = [lead.first_name, lead.last_name].filter(Boolean).join(" ")
+  return {
+    title: name,
+    description: `Lead profile for ${name}${lead.company ? ` at ${lead.company}` : ""}.`,
+  }
+}
 
 // ─── Hero helpers ─────────────────────────────────────────────────────────────
 

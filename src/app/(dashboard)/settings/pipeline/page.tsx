@@ -1,7 +1,13 @@
+import type { Metadata } from "next"
 import { getPipelineData } from "@/lib/queries/deals"
 import { PipelineStageConfig } from "@/components/pipeline/pipeline-stage-config"
 import { ChevronLeft } from "lucide-react"
 import Link from "next/link"
+
+export const metadata: Metadata = {
+  title: "Pipeline Stages",
+  description: "Add, reorder, and configure the stages in your sales pipeline.",
+}
 
 export default async function PipelineSettingsPage() {
   const stages = await getPipelineData()

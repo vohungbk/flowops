@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { Suspense } from "react"
 import {
   getRevenueChartData,
@@ -7,6 +8,11 @@ import {
   getRepLeaderboard,
   getKpiMetrics,
 } from "@/lib/queries/analytics"
+
+export const metadata: Metadata = {
+  title: "Analytics",
+  description: "Revenue trends, pipeline breakdown, lead sources, and conversion funnel insights.",
+}
 import { RevenueChart } from "@/components/dashboard/revenue-chart"
 import { PipelineChart } from "@/components/dashboard/pipeline-chart"
 import { LeadSourceChart } from "@/components/analytics/lead-source-chart"

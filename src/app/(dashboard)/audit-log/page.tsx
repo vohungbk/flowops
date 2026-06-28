@@ -1,8 +1,14 @@
+import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { Suspense } from "react"
 import { Shield } from "lucide-react"
 import { getCurrentProfile } from "@/lib/actions/auth"
 import { getAuditLogs, getProfilesForSelect } from "@/lib/queries/audit-log"
+
+export const metadata: Metadata = {
+  title: "Audit Log",
+  description: "Immutable log of all actions taken in the system, with field-level change tracking.",
+}
 import { AuditLogFilters } from "@/components/audit-log/audit-log-filters"
 import { AuditLogTable } from "@/components/audit-log/audit-log-table"
 import { Skeleton } from "@/components/ui/skeleton"

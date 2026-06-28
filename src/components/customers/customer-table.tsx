@@ -287,6 +287,7 @@ export function CustomerTable({
           </p>
           <div className="flex items-center gap-2">
             <button
+              aria-label="Previous page"
               className={cn(buttonVariants({ variant: "outline", size: "icon-sm" }))}
               onClick={() => goToPage(page - 1)}
               disabled={page <= 1}
@@ -297,6 +298,7 @@ export function CustomerTable({
               Page {page} of {totalPages}
             </span>
             <button
+              aria-label="Next page"
               className={cn(buttonVariants({ variant: "outline", size: "icon-sm" }))}
               onClick={() => goToPage(page + 1)}
               disabled={page >= totalPages}

@@ -1,5 +1,12 @@
+import type { Metadata } from "next"
 import { Zap, CheckCircle2, BarChart3, Users, Kanban } from "lucide-react"
 import { LoginForm } from "@/components/auth/login-form"
+
+export const metadata: Metadata = {
+  title: "Sign In",
+  description:
+    "Sign in to your FlowOps account to manage customers, leads, and your sales pipeline.",
+}
 
 const features = [
   {

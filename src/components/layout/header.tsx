@@ -49,6 +49,7 @@ export function Header({ profile, notifications, unreadCount }: HeaderProps) {
 
         {/* Search trigger → Command Palette */}
         <button
+          aria-label="Open search"
           className="flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted"
           onClick={() =>
             document.dispatchEvent(

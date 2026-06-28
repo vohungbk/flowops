@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ChevronLeft, Trash2, Pencil } from "lucide-react"
@@ -8,6 +9,20 @@ import { CustomerDetailTabs } from "@/components/customers/customer-detail-tabs"
 import { CustomerFormDialog } from "@/components/customers/customer-form"
 import { DeleteCustomerDialog } from "@/components/customers/delete-customer-dialog"
 import type { Tag } from "@/types"
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  const { customer } = await getCustomerById(id)
+  if (!customer) return { title: "Customer Not Found" }
+  return {
+    title: customer.company_name,
+    description: `Customer profile for ${customer.company_name}${customer.contact_name ? ` — ${customer.contact_name}` : ""}.`,
+  }
+}
 
 // ─── Hero helpers (server-renderable, no interactivity) ───────────────────────
 

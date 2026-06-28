@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { Suspense } from "react"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -6,6 +7,11 @@ import { getCustomers } from "@/lib/queries/customers"
 import { CustomerFilters } from "@/components/customers/customer-filters"
 import { CustomerTable } from "@/components/customers/customer-table"
 import { CustomerFormDialog } from "@/components/customers/customer-form"
+
+export const metadata: Metadata = {
+  title: "Customers",
+  description: "Manage your customer accounts, contacts, and relationships.",
+}
 
 type SearchParams = {
   search?: string

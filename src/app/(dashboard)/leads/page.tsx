@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { Suspense } from "react"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -6,6 +7,11 @@ import { getLeads } from "@/lib/queries/leads"
 import { LeadFilters } from "@/components/leads/lead-filters"
 import { LeadTable } from "@/components/leads/lead-table"
 import { LeadFormDialog } from "@/components/leads/lead-form"
+
+export const metadata: Metadata = {
+  title: "Leads",
+  description: "Track and qualify inbound leads before converting them to customers.",
+}
 
 type SearchParams = {
   search?: string

@@ -10,8 +10,28 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "FlowOps — Business Management Platform",
-  description: "CRM & Business Management for modern teams",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
+  ),
+  title: {
+    default: "FlowOps — CRM & Business Management",
+    template: "%s | FlowOps",
+  },
+  description:
+    "Streamline your sales pipeline, manage customers, and track leads — all in one place.",
+  openGraph: {
+    type: "website",
+    siteName: "FlowOps",
+    title: "FlowOps — CRM & Business Management",
+    description:
+      "Streamline your sales pipeline, manage customers, and track leads — all in one place.",
+  },
+  twitter: {
+    card: "summary",
+    title: "FlowOps — CRM & Business Management",
+    description:
+      "Streamline your sales pipeline, manage customers, and track leads — all in one place.",
+  },
 }
 
 export default function RootLayout({

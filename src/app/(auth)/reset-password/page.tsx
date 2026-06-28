@@ -1,6 +1,13 @@
+import type { Metadata } from "next"
 import { Zap } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { ResetPasswordForm } from "@/components/auth/reset-password-form"
+
+export const metadata: Metadata = {
+  title: "Reset Password",
+  description: "Set a new password for your FlowOps account.",
+  robots: { index: false, follow: false },
+}
 
 export default async function ResetPasswordPage() {
   const supabase = await createClient()

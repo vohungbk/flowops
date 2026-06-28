@@ -71,6 +71,7 @@ export function LeadFilters() {
       <div className="relative max-w-xs flex-1">
         <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         <Input
+          aria-label="Search leads"
           placeholder="Search name, email, company…"
           value={localSearch}
           onChange={(e) => setLocalSearch(e.target.value)}

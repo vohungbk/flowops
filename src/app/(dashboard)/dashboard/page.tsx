@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import {
   getKpiMetrics,
   getRevenueChartData,
@@ -5,6 +6,11 @@ import {
   getRecentActivities,
   getTopDeals,
 } from "@/lib/queries/analytics"
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description: "Overview of your revenue, pipeline health, and recent activity.",
+}
 import { KpiGrid } from "@/components/dashboard/kpi-card"
 import { RevenueChart } from "@/components/dashboard/revenue-chart"
 import { PipelineChart } from "@/components/dashboard/pipeline-chart"

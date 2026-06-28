@@ -1,6 +1,12 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { Kanban, User, Users, Bell, Tag } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
+
+export const metadata: Metadata = {
+  title: "Settings",
+  description: "Configure your FlowOps workspace — pipeline stages, profile, team, and notifications.",
+}
 
 const sections = [
   {
