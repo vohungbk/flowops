@@ -9,10 +9,13 @@ const inter = Inter({
   subsets: ["latin"],
 })
 
+const appUrl = (() => {
+  const raw = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
+  return raw.startsWith("http") ? raw : `https://${raw}`
+})()
+
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
-  ),
+  metadataBase: new URL(appUrl),
   title: {
     default: "FlowOps — CRM & Business Management",
     template: "%s | FlowOps",
