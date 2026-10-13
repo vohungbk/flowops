@@ -1,36 +1,113 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FlowOps
+
+CRM & Business Management SaaS. Manage customers, leads, and the sales pipeline in one place.
+
+**Live demo:** https://flowops-steel.vercel.app/
+
+## Features
+
+- **Authentication** - Email/password login, Magic Link, password reset.
+- **Dashboard** - Key metrics and recent activity at a glance.
+- **Customers** - Full CRUD, tags, search, filters, and pagination.
+- **Leads** - Track leads by status and source, and convert them to deals.
+- **Sales Pipeline** - Kanban board with drag and drop (dnd-kit). Configurable stages.
+- **Employees** - Team management and role assignment.
+- **Analytics** - Conversion funnel, lead sources, and rep leaderboard with period selector.
+- **Audit Log** - Immutable record of important changes.
+- **Notifications** - In-app notification bell.
+- **Command Palette** - Global search and quick navigation.
+- **Settings** - Profile and app preferences.
+- **UI** - Dark/light theme, responsive layout, loading skeletons, SEO metadata.
+
+## Roles (RBAC)
+
+| Role | Access |
+|---|---|
+| Admin | Full access |
+| Manager | Team-scoped data |
+| Employee | Own data only |
+
+Access is enforced at the database level with Supabase Row Level Security (RLS), and at the route level in `src/proxy.ts`.
+
+## Tech Stack
+
+- **Framework:** Next.js 16 (App Router), React 19, TypeScript
+- **Backend:** Supabase (PostgreSQL, Auth, Realtime)
+- **UI:** Tailwind CSS 4, shadcn/ui on `@base-ui/react`, lucide-react
+- **Forms & validation:** react-hook-form, Zod v4
+- **Data & charts:** TanStack Table, Recharts
+- **Drag and drop:** dnd-kit
+- **Hosting:** Vercel
 
 ## Getting Started
 
-First, run the development server:
+### Requirements
+
+- Node.js 20+
+- A Supabase project
+
+### Setup
+
+```bash
+git clone <repo-url>
+cd flowops
+npm install
+cp .env.example .env.local
+```
+
+Fill in `.env.local` (Supabase Dashboard -> Settings -> API):
+
+| Variable | Description |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
+| `NEXT_PUBLIC_APP_URL` | App URL, used for the Magic Link redirect |
+
+### Database
+
+1. Open Supabase Dashboard -> SQL Editor.
+2. Run the files in `supabase/migrations/` in order.
+3. (Optional) Run `supabase/seed.sql` for sample data.
+4. Sign up the first user, then run `supabase/promote_first_admin.sql` to make them admin.
+
+### Run
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Description |
+|---|---|
+| `npm run dev` | Start the dev server |
+| `npm run build` | Production build |
+| `npm run start` | Run the production build |
+| `npm run lint` | Run ESLint |
+| `npx tsc --noEmit` | Type-check |
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+  app/
+    (auth)/          # login, reset-password
+    (dashboard)/     # protected pages
+    auth/callback/   # Magic Link handler
+  components/        # UI and feature components
+  lib/
+    actions/         # Server Actions (mutations)
+    queries/         # Server-side data fetching
+    supabase/        # client / server / middleware clients
+    validations/     # Zod schemas
+  types/             # Database and app types
+  proxy.ts           # Route protection
+supabase/
+  migrations/        # SQL schema, RLS, notifications
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Deployed on Vercel. Set the three environment variables above in the Vercel project settings, and set `NEXT_PUBLIC_APP_URL` to the production URL.
