@@ -19,11 +19,11 @@ Use a read-only or sandbox account. Do not reuse a real password.
 
 ## Screenshots
 
-> TODO: add images to `docs/screenshots/` and link them here.
-
-| Sales Pipeline (Kanban) | Analytics |
+| Dashboard | Analytics |
 |---|---|
-| ![Pipeline](docs/screenshots/pipeline.png) | ![Analytics](docs/screenshots/analytics.png) |
+| ![Dashboard](docs/screenshots/dashboard.webp) | ![Analytics](docs/screenshots/analytics.webp) |
+
+> TODO: add a Kanban pipeline screenshot as `docs/screenshots/pipeline.webp`.
 
 ## Features
 
