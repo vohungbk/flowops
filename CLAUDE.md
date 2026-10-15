@@ -11,7 +11,7 @@ npm run lint      # ESLint (Next.js core-web-vitals + TypeScript rules)
 npx tsc --noEmit  # Type-check without emitting — use this to verify types
 ```
 
-No test framework is configured yet.
+Tests: `npm test` (Vitest, `src/**/*.test.ts`).
 
 ## Architecture
 

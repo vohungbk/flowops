@@ -1,8 +1,29 @@
 # FlowOps
 
-CRM & Business Management SaaS. Manage customers, leads, and the sales pipeline in one place.
+![CI](https://github.com/vohungbk/flowops/actions/workflows/ci.yml/badge.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+
+CRM SaaS with role-based access control (RBAC), built on Next.js 16 and Supabase. Manage customers, leads, and a Kanban sales pipeline in one place.
 
 **Live demo:** https://flowops-steel.vercel.app/
+
+## Demo account
+
+> TODO: create a demo user in Supabase and fill in the credentials below.
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | `<demo-admin-email>` | `<demo-password>` |
+
+Use a read-only or sandbox account. Do not reuse a real password.
+
+## Screenshots
+
+> TODO: add images to `docs/screenshots/` and link them here.
+
+| Sales Pipeline (Kanban) | Analytics |
+|---|---|
+| ![Pipeline](docs/screenshots/pipeline.png) | ![Analytics](docs/screenshots/analytics.png) |
 
 ## Features
 
@@ -28,6 +49,38 @@ CRM & Business Management SaaS. Manage customers, leads, and the sales pipeline 
 | Employee | Own data only |
 
 Access is enforced at the database level with Supabase Row Level Security (RLS), and at the route level in `src/proxy.ts`.
+
+## Architecture
+
+### Data model
+
+```
+auth.users 1─1 profiles (role: admin | manager | employee)
+customers ─< customer_tags >─ tags
+customers ─< deals >─ pipeline_stages
+leads ──(convert)──> customers / deals
+activities  -> linked to a customer, lead, or deal
+audit_logs  -> append-only (no UPDATE / DELETE policy)
+```
+
+### Request flow
+
+- Pages are Server Components. They read data through `src/lib/queries/`.
+- Mutations are Server Actions in `src/lib/actions/`. Each action validates input with Zod, writes, then calls `revalidatePath`.
+- Three Supabase clients are used: browser, server, and proxy. Each is used only in its own context.
+- `src/proxy.ts` protects all dashboard routes (Next.js 16 `proxy`, replaces `middleware`).
+
+### Security model
+
+- Authorization lives in the database. Every table has Row Level Security (RLS) enabled.
+- Policies use a `SECURITY DEFINER` function, `current_user_role()`, to read the role without RLS recursion.
+- Employees see their own records. Managers and admins see wider scopes. Only admins manage roles.
+- A hardening migration blocks role self-escalation on `profiles` with a `WITH CHECK` clause.
+- Note: this is a single-organization app with role-based scoping, not multi-tenant.
+
+### Lead scoring
+
+`src/lib/lead-scoring.ts` computes a 0-100 score from profile completeness (25), source (25), status (20), and activity engagement (30). It is a pure function covered by unit tests.
 
 ## Tech Stack
 
@@ -86,7 +139,10 @@ Open http://localhost:3000.
 | `npm run build` | Production build |
 | `npm run start` | Run the production build |
 | `npm run lint` | Run ESLint |
+| `npm test` | Run unit tests (Vitest) |
 | `npx tsc --noEmit` | Type-check |
+
+CI runs lint, type-check, and tests on every push and pull request (`.github/workflows/ci.yml`).
 
 ## Project Structure
 
@@ -107,6 +163,10 @@ src/
 supabase/
   migrations/        # SQL schema, RLS, notifications
 ```
+
+## License
+
+MIT. See [LICENSE](LICENSE).
 
 ## Deployment
 
