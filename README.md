@@ -9,13 +9,13 @@ CRM SaaS with role-based access control (RBAC), built on Next.js 16 and Supabase
 
 ## Demo account
 
-> TODO: create a demo user in Supabase and fill in the credentials below.
+Sign in at the live demo with:
 
 | Role | Email | Password |
 |---|---|---|
-| Admin | `<demo-admin-email>` | `<demo-password>` |
+| Sales rep | `sarah.rep@demo.app` | `demo@2026` |
 
-Use a read-only or sandbox account. Do not reuse a real password.
+This is a shared demo account with sample data only.
 
 ## Screenshots
 
