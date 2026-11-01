@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import { GoogleAnalytics } from "@next/third-parties/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/layout/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
@@ -13,6 +14,8 @@ const appUrl = (() => {
   const raw = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
   return raw.startsWith("http") ? raw : `https://${raw}`
 })()
+
+const gaId = process.env.NEXT_PUBLIC_GA_ID
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
@@ -56,6 +59,9 @@ export default function RootLayout({
           </TooltipProvider>
         </ThemeProvider>
       </body>
+      {gaId && process.env.NODE_ENV === "production" && (
+        <GoogleAnalytics gaId={gaId} />
+      )}
     </html>
   )
 }
