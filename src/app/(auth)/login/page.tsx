@@ -4,6 +4,7 @@ import { LoginForm } from "@/components/auth/login-form"
 
 export const metadata: Metadata = {
   title: "Sign In",
+  alternates: { canonical: "/login" },
   description:
     "Sign in to your FlowOps account to manage customers, leads, and your sales pipeline.",
 }

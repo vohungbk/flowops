@@ -1,7 +1,14 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import { GoogleAnalytics } from "@next/third-parties/google"
 import "./globals.css"
+import {
+  APP_URL,
+  BRAND_COLOR,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TITLE,
+} from "@/lib/site"
 import { ThemeProvider } from "@/components/layout/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
 
@@ -10,33 +17,42 @@ const inter = Inter({
   subsets: ["latin"],
 })
 
-const appUrl = (() => {
-  const raw = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
-  return raw.startsWith("http") ? raw : `https://${raw}`
-})()
-
 const gaId = process.env.NEXT_PUBLIC_GA_ID
 
+export const viewport: Viewport = {
+  themeColor: BRAND_COLOR,
+}
+
 export const metadata: Metadata = {
-  metadataBase: new URL(appUrl),
+  metadataBase: new URL(APP_URL),
+  applicationName: SITE_NAME,
   title: {
-    default: "FlowOps — CRM & Business Management",
-    template: "%s | FlowOps",
+    default: SITE_TITLE,
+    template: `%s | ${SITE_NAME}`,
   },
-  description:
-    "Streamline your sales pipeline, manage customers, and track leads — all in one place.",
+  description: SITE_DESCRIPTION,
+  keywords: [
+    "CRM",
+    "sales pipeline",
+    "lead management",
+    "customer management",
+    "business management",
+    "FlowOps",
+  ],
+  alternates: { canonical: "/" },
+  robots: { index: true, follow: true },
   openGraph: {
     type: "website",
-    siteName: "FlowOps",
-    title: "FlowOps — CRM & Business Management",
-    description:
-      "Streamline your sales pipeline, manage customers, and track leads — all in one place.",
+    siteName: SITE_NAME,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: "/",
+    locale: "en_US",
   },
   twitter: {
-    card: "summary",
-    title: "FlowOps — CRM & Business Management",
-    description:
-      "Streamline your sales pipeline, manage customers, and track leads — all in one place.",
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
   },
 }
 

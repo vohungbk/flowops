@@ -1,9 +1,15 @@
+import type { Metadata } from "next"
 import { Toaster } from "sonner"
 import { Sidebar } from "@/components/layout/sidebar"
 import { Header } from "@/components/layout/header"
 import { CommandPalette } from "@/components/shared/command-palette"
 import { getCurrentProfile } from "@/lib/actions/auth"
 import { getNotifications } from "@/lib/queries/notifications"
+
+// Authenticated pages must never be indexed.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+}
 
 export default async function DashboardLayout({
   children,
