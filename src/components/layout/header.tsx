@@ -45,7 +45,7 @@ export function Header({ profile, notifications, unreadCount }: HeaderProps) {
     <header className="flex h-14 shrink-0 items-center justify-between border-b bg-background px-4">
       <div className="flex items-center gap-2">
         {/* Hamburger — mobile only */}
-        <MobileSidebar />
+        <MobileSidebar role={profile?.role} />
 
         {/* Search trigger → Command Palette */}
         <button

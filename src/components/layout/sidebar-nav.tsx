@@ -15,12 +15,14 @@ import {
   Zap,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import type { UserRole } from "@/types"
 
 type NavItem = {
   label: string
   href: string
   icon: LucideIcon
   badge?: number
+  roles?: UserRole[]
 }
 
 type NavGroup = {
@@ -49,8 +51,8 @@ const navGroups: NavGroup[] = [
   {
     label: "Team",
     items: [
-      { label: "Employees", href: "/employees", icon: UserCog },
-      { label: "Audit Log", href: "/audit-log", icon: ShieldCheck },
+      { label: "Employees", href: "/employees", icon: UserCog, roles: ["admin", "manager"] },
+      { label: "Audit Log", href: "/audit-log", icon: ShieldCheck, roles: ["admin"] },
     ],
   },
 ]
@@ -108,8 +110,23 @@ export function SidebarLogo() {
   )
 }
 
-export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
+export function SidebarNav({
+  role,
+  onNavigate,
+}: {
+  role?: UserRole
+  onNavigate?: () => void
+}) {
   const pathname = usePathname()
+
+  const visibleGroups = navGroups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter(
+        (item) => !item.roles || (role !== undefined && item.roles.includes(role))
+      ),
+    }))
+    .filter((group) => group.items.length > 0)
 
   function isActive(href: string) {
     if (href === "/dashboard") return pathname === "/dashboard"
@@ -119,7 +136,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       <nav className="flex-1 overflow-y-auto p-2 pt-3 space-y-4">
-        {navGroups.map((group, i) => (
+        {visibleGroups.map((group, i) => (
           <div key={i}>
             {group.label && (
               <p className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-wider text-sidebar-foreground/40">

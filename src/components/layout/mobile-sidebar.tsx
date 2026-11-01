@@ -5,9 +5,10 @@ import { Menu } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
+import type { UserRole } from "@/types"
 import { SidebarLogo, SidebarNav } from "@/components/layout/sidebar-nav"
 
-export function MobileSidebar() {
+export function MobileSidebar({ role }: { role?: UserRole }) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -27,7 +28,7 @@ export function MobileSidebar() {
           className="flex w-60 flex-col gap-0 p-0 bg-sidebar"
         >
           <SidebarLogo />
-          <SidebarNav onNavigate={() => setOpen(false)} />
+          <SidebarNav role={role} onNavigate={() => setOpen(false)} />
         </SheetContent>
       </Sheet>
     </>
